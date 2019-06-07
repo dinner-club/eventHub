@@ -1,28 +1,29 @@
 export class LinkNode {
-  next: LinkNode;
-  previous: LinkNode;
-  val: any;
+  public next: LinkNode;
+  public previous: LinkNode;
+  public val: any;
 
-  constructor (val : any, previous? : LinkNode, next? : LinkNode) {
+  public constructor (val: any, previous? : LinkNode, next? : LinkNode) {
     this.val = val;
     this.previous = previous || this;
     this.next = next || this;
   }
 
-  remove() {
+  public remove(): LinkNode {
     this.next.previous = this.previous;
     this.previous.next = this.next;
+    return this;
   }
 }
 
 export class LinkedList {
-  sentinel: LinkNode;
+  private sentinel: LinkNode;
   
-  constructor() {
+  public constructor() {
     this.sentinel = new LinkNode(null);
   }
 
-  forEach(callback : (this: void, linkNode: LinkNode, idx: number) => void) {
+  public forEach(callback: (this: void, linkNode: LinkNode, idx: number) => void): LinkedList {
     let idx = 0;
     let current = this.sentinel.next;
     while (current !== this.sentinel) {
@@ -30,12 +31,13 @@ export class LinkedList {
       idx += 1;
       current = current.next;
     }
+    return this;
   }
 
-  forEachAsync(callback : (this: void, linkNode: LinkNode, idx: number) => void) {
-    let promises = [];
-    this.forEach((linkNode, idx) => {
-      const promise = new Promise (async (resolve, reject) => {
+  public forEachAsync(callback: (this: void, linkNode: LinkNode, idx: number) => void): Promise<{}> {
+    let promises: Promise<{}>[] = [];
+    this.forEach((linkNode, idx): void => {
+      const promise = new Promise ((resolve, reject): void => {
         try {
           callback(linkNode, idx);
         } catch (error) {
