@@ -5,3 +5,13 @@ This is largely based off a waking dream where I feverishly thought through an e
 I can't remember the whole dream (I was too tired to get up and write code, and too wired to sleep), so I'm missing a few of the 'Aha!' moments that must have happened in my insomniatic state, but the idea for now is to provide a registration system in a central location where componenents (web/webworkers/functions/whatever) can register listeners and trigger events.
 
 I'm really hoping that this doesn't just turn into Redux-Lite, but if it does, at least I'll know I had something worth keeping.
+
+---
+
+## Main Goals
+
+* Provide a single place to register/deregister new events
+* Provide visibility into what events are available to trigger.
+* Provide visibility into what arguments are expected for a given event.
+* Provide visibility into who registered a particular listener/event.
+* Provide a maintainable, debuggable pattern for sending variform data from a myriad of sources and recieving variform data in a myriad of consumers.
