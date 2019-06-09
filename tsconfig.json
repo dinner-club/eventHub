@@ -7,7 +7,8 @@
       "outDir": "build",
       "sourceMap": true,
       "lib": [
-        "esnext"
+        "esnext",
+        "dom"
       ]
   },
   "include": [
