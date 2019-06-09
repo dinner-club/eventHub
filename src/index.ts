@@ -1,33 +1,69 @@
+import LinkNode from "./linkedList/LinkNode";
+import LinkedList from "./linkedList";
+
+interface EventHubListener {
+  id: string;
+  key: string;
+  registrant: string;
+  callback: Function;
+}
+
+interface ListenerDictionaryEntry extends EventHubListener {
+  linkNode: LinkNode;
+}
+
 interface ListenerDictionary {
-  [propName: string]: Function;
+  [listenerKey: string]: ListenerDictionaryEntry;
+}
+
+interface EventHubEvent {
+  key: string;
+  description: string;
+  arguments: string[];
+  registrant: string;
+}
+
+interface EventDictionaryEntry extends EventHubEvent {
+  listeners: LinkedList;
 }
 
 interface EventDictionary {
-  [propName: string]: Function[];
+  [eventKey: string]: EventDictionaryEntry;
 }
 
 export default class EventHub {
-  private listeners: ListenerDictionary;
-  private events: EventDictionary;
+  private _eventDictionary: EventDictionary;
+  private _listenerDictionary: ListenerDictionary;
 
   public constructor() {
-    this.listeners = {};
-    this.events = {};
+    this._eventDictionary = {};
+    this._listenerDictionary = {};
   }
 
-  public registerListener(key: string, listener: Function) {
-
+  public registerEvent(eventHubEvent: EventHubEvent): void {
+    const eventListenersList = new LinkedList();
+    this._eventDictionary[eventHubEvent.key] = {
+      ...eventHubEvent,
+      listeners: eventListenersList,
+    };
   }
 
-  public deregisterListener(key: string) {
-
+  public registerListener(eventHubListener: EventHubListener): void {
+    const event = this._eventDictionary[eventHubListener.key];
+    const linkNode = event.listeners.push(eventHubListener).last();
+    this._listenerDictionary[eventHubListener.id] = {
+      ...eventHubListener,
+      linkNode,
+    }
   }
 
-  public subscribe(event: string, listener: Function, key: string) {
-
+  public deRegisterListener(id: string) {
+    // remove node
+    // remove from listener dictionary
   }
 
-  public unsubscribe(event: string, key: string) {
-
+  public deRegisterEvent(key: string) {
+    // remove listeners from listener dictionary
+    // remove from event dictionary
   }
 }

@@ -161,12 +161,12 @@ describe('LinkedList', () => {
       });
 
       it('errors with invalid callback', async () => {
-        const failBack = () => { throw "Nope"; };
+        const failBack = () => { throw 'Intentional Error'; };
         try {
           await list.forEachAsync(failBack);
           expect(true).toBe(false);
         } catch (error) {
-          expect(error).not.toBe(undefined);
+          expect(error).toBe('Intentional Error');
         }
       });
     });

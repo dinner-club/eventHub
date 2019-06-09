@@ -1,8 +1,8 @@
 import EventHub from '../src';
 
 describe('FakeTest', () => {
-  it('returns true', () => {
+  test('smoke test', () => {
     const hub = new EventHub();
-    expect(true).toBe(true);
+    expect(hub).toBeInstanceOf(EventHub);
   });
 });
