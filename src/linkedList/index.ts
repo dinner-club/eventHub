@@ -3,8 +3,13 @@ import LinkNode from "./LinkNode";
 class LinkedList {
   private _sentinel: LinkNode;
   
-  public constructor() {
+  public constructor(initialLinkValues: any[] = []) {
     this._sentinel = new LinkNode(null);
+    this.setLinks(initialLinkValues);
+  }
+
+  private setLinks(initialLinkValues: any[]) {
+    initialLinkValues.forEach(value => this.push(value));
   }
 
   public push(val: any): LinkedList {

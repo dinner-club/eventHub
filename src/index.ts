@@ -1,5 +1,6 @@
 import LinkNode from "./linkedList/LinkNode";
 import LinkedList from "./linkedList";
+import Middleware from "./middleware";
 
 interface EventHubListener {
   id: string;
@@ -31,13 +32,28 @@ interface EventDictionary {
   [eventKey: string]: EventDictionaryEntry;
 }
 
+interface EventHubConstructorArgument {
+  middleware?: Function[];
+}
+
+interface EventHubMessage {
+  payload: any;
+  meta: {
+    key: string;
+    sender: string;
+  }
+}
+
 export default class EventHub {
   private _eventDictionary: EventDictionary;
   private _listenerDictionary: ListenerDictionary;
+  private _middleware: Middleware[];
 
-  public constructor() {
+  public constructor({ middleware = [] }: EventHubConstructorArgument = {}) {
     this._eventDictionary = {};
     this._listenerDictionary = {};
+    this._middleware = [];
+    this._setMiddleware([this._logPreMiddlewareMessage.bind(this), ...middleware, this._send.bind(this)])
   }
 
   public registerEvent(eventHubEvent: EventHubEvent): void {
@@ -57,13 +73,37 @@ export default class EventHub {
     }
   }
 
-  public deRegisterListener(id: string) {
-    // remove node
-    // remove from listener dictionary
+  public deregisterListener(id: string) {
+    const listener = this._listenerDictionary[id];
+    listener.linkNode.remove();
+    delete this._listenerDictionary[id];
   }
 
-  public deRegisterEvent(key: string) {
-    // remove listeners from listener dictionary
-    // remove from event dictionary
+  public deregisterEvent(key: string) {
+    delete this._eventDictionary[key];
+  }
+
+  public broadcast(message: EventHubMessage) {
+    this._middleware[0].handler(message);
+  }
+
+  private _setMiddleware(middleware: any[]) {
+    const all = {};
+    middleware.forEach((middlewareFn, idx) => {
+      this._middleware.push(new Middleware({fn: middlewareFn, idx, all}))
+    });
+  }
+
+  private _logPreMiddlewareMessage(next: Function, msg: EventHubMessage) {
+    console.log('Pre-middleware message:', msg);
+    next(msg);
+  }
+
+  private _send(_next: Function, msg: EventHubMessage) {
+    console.log('Post-middleware message:', msg);
+    const event = this._eventDictionary[msg.meta.key];
+    event.listeners.forEach((linkNode) => {
+      linkNode.val.callback(msg);
+    });
   }
 }

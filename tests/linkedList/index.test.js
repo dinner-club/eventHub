@@ -55,6 +55,17 @@ describe('LinkedList', () => {
 
   });
 
+  describe('When creating with inital values', () => {
+    it('sets provided values when initialized', () => {
+      const initialLinkValues = ["a", "b", "c"];
+      const linkedList = new LinkedList(initialLinkValues);
+      const first = linkedList.first();
+      expect(first.val).toBe(initialLinkValues[0]);
+      expect(first.next().val).toBe(initialLinkValues[1]);
+      expect(linkedList.last().val).toBe(initialLinkValues[2]);
+    });
+  });
+
   describe('Removing values', () => {
     let list;
 

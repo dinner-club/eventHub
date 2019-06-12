@@ -1,7 +1,7 @@
 class LinkNode {
   private _next: LinkNode;
   private _previous: LinkNode;
-  private val: any;
+  public val: any;
   public constructor(val: any, previous?: LinkNode, next?: LinkNode) {
     this.val = val;
     this._previous = previous || this;
