@@ -44,7 +44,7 @@ interface EventHubMessage {
   }
 }
 
-export default class EventHub {
+class EventHub {
   private _eventDictionary: EventDictionary;
   private _listenerDictionary: ListenerDictionary;
   private _middleware: Middleware[];
@@ -107,3 +107,5 @@ export default class EventHub {
     });
   }
 }
+
+export default EventHub;

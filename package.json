@@ -1,8 +1,12 @@
 {
-  "name": "eventhub",
+  "name": "@dinner-club/eventhub",
   "version": "0.1.0-0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dinner-club/eventHub"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -10,7 +14,7 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint ./src/* --fix-dry-run"
   },
-  "author": "dallashall <dallas.hall@gmail.com>",
+  "author": "dallashall <dallas@dallashall.tech>",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.5",
