@@ -100,9 +100,16 @@ describe('FakeTest', () => {
     });
 
     describe('without middleware', () => {
-      it('calls the listeners callback', () => {
+      it('calls the listeners callback', async () => {
+        expect.assertions(1);
         hub.broadcast(message);
-        expect(callback).toBeCalledWith(message);
+        const test = new Promise((resolve) => {
+          setTimeout(() => {
+            expect(callback).toBeCalledWith(message);
+            resolve();
+          }, 0);
+        });
+        await test;
       });
     });
   });

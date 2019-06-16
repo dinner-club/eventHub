@@ -95,14 +95,12 @@ class EventHub {
   }
 
   private _logPreMiddlewareMessage(next: Function, msg: EventHubMessage) {
-    console.log('Pre-middleware message:', msg);
     next(msg);
   }
 
   private _send(_next: Function, msg: EventHubMessage) {
-    console.log('Post-middleware message:', msg);
     const event = this._eventDictionary[msg.meta.key];
-    event.listeners.forEach((linkNode) => {
+    event.listeners.forEachAsync((linkNode) => {
       linkNode.val.callback(msg);
     });
   }
