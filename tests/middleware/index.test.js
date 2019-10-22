@@ -17,8 +17,6 @@ describe('Middleware', () => {
     let middlewareFn3;
     let all;
     let middleware1;
-    let middleware2;
-    let middleware3;
     beforeEach(() => {
       all = {}
       middlewareFn1 = jest.fn((next, message) => {
@@ -31,8 +29,8 @@ describe('Middleware', () => {
         next(message + 1);
       });
       middleware1 = new Middleware({ fn: middlewareFn1, all, idx: 0 });
-      middleware2 = new Middleware({ fn: middlewareFn2, all, idx: 1 });
-      middleware3 = new Middleware({ fn: middlewareFn3, all, idx: 2 });
+      new Middleware({ fn: middlewareFn2, all, idx: 1 });
+      new Middleware({ fn: middlewareFn3, all, idx: 2 });
     });
 
     it('correctly passes the next function to the next middleware', () => {
