@@ -1,28 +1,29 @@
+import { EventHubMessage } from "..";
+import LinkedList from "../linkedList";
+
+export type MiddlewareFn = (message: EventHubMessage) => EventHubMessage;
+
 class Middleware {
-  public idx: number;
-  public fn: Function;
-  public all: {
-    [key: number]: Middleware;
-  };
+  private _middlewareList: LinkedList;
 
-  public constructor({fn, idx, all}: {fn: Function, idx: number, all: {}}) {
-    this.fn = fn;
-    this.all = all;
-    this.idx = idx;
-    this.next = this.next.bind(this);
-    this.all[this.idx] = this;
+  public constructor(middlewares: MiddlewareFn[]) {
+    this._middlewareList = new LinkedList(middlewares);
   }
 
-  public handler(message: any) {
-    this.fn(this.next, message);
+  public push(fn: MiddlewareFn): void {
+    this._middlewareList.insertBefore(this._middlewareList.last(), fn);
   }
 
-  public next(message: any): void {
-    const nextIdx = this.idx + 1;
-    const nextMiddleware = this.all[nextIdx];
-    if (nextMiddleware) {
-      nextMiddleware.handler(message);
-    }
+  public unshift(fn: MiddlewareFn): void {
+    this._middlewareList.insertAfter(this._middlewareList.first(), fn);
+  }
+
+  public chain(message: EventHubMessage): EventHubMessage {
+    let currentMessage = message;
+    this._middlewareList.forEach((node): void => {
+      currentMessage = node.val(currentMessage);
+    });
+    return currentMessage;
   }
 }
 

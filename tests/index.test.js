@@ -1,4 +1,4 @@
-import EventHub from '../src';
+import EventHub, { Middleware } from '../src';
 
 describe('FakeTest', () => {
   test('smoke test', () => {
@@ -88,6 +88,15 @@ describe('FakeTest', () => {
         sender: 'Jest listener callback test',
       }
     };
+    const message2 = {
+      payload: {
+        testArg: "randomArg2",
+      },
+      meta: {
+        key: event1.key,
+        sender: 'Jest listener callback test',
+      }
+    };
     let callback;
 
     beforeEach(() => {
@@ -110,6 +119,50 @@ describe('FakeTest', () => {
           }, 0);
         });
         await test;
+      });
+    });
+
+    describe('setting middleware', () => {
+      beforeEach(() => {
+        hub = new EventHub();
+        hub.registerEvent(event1);
+  
+        callback = jest.fn();
+        listener1.callback = callback;
+        hub.registerListener(listener1);
+      });
+  
+      describe('push', () => {
+        it('adds the middleware to the end of the _middleware', async () => {
+          expect.assertions(1);
+          const testFn = jest.fn(() => message2);
+          hub.pushMiddleware(testFn);
+          hub.broadcast(message);
+          const test = new Promise((resolve) => {
+            setTimeout(() => {
+              expect(testFn).toBeCalledWith(message);
+              resolve();
+            }, 0);
+          });
+          await test;
+        });
+      });
+  
+      describe('unshift', () => {
+        it('adds the middleware to the beginning of the _middleware', async () => {
+          expect.assertions(1);
+          const testFn = jest.fn(() => message2);
+          hub.unshiftMiddleware(testFn);
+          hub.broadcast(message);
+
+          const test = new Promise((resolve) => {
+            setTimeout(() => {
+              expect(testFn).toBeCalledWith(message);
+              resolve();
+            }, 0);
+          });
+          await test;
+        });
       });
     });
   });

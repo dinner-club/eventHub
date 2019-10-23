@@ -8,8 +8,8 @@ class LinkedList {
     this.setLinks(initialLinkValues);
   }
 
-  private setLinks(initialLinkValues: any[]) {
-    initialLinkValues.forEach(value => this.push(value));
+  private setLinks(initialLinkValues: any[]): void {
+    initialLinkValues.forEach((value): void => { this.push(value) });
   }
 
   public push(val: any): LinkedList {
@@ -25,6 +25,24 @@ class LinkedList {
     const prevNode = new LinkNode(val, this._sentinel, originalFirst);
     originalFirst.setPrevious(prevNode);
     this._sentinel.setNext(prevNode);
+    return this;
+  }
+
+  public insertAfter(link: LinkNode, val: any): LinkedList {
+    const current = link;
+    const oldNext = link.next();
+    const inserted = new LinkNode(val, current, oldNext);
+    oldNext.setPrevious(inserted);
+    current.setNext(inserted);
+    return this;
+  }
+
+  public insertBefore(link: LinkNode, val: any): LinkedList {
+    const current = link;
+    const oldPrev = link.previous();
+    const inserted = new LinkNode(val, oldPrev, current);
+    current.setPrevious(inserted);
+    oldPrev.setNext(inserted);
     return this;
   }
 
@@ -57,12 +75,13 @@ class LinkedList {
 
   public forEachAsync(callback: (this: void, linkNode: LinkNode, idx: number) => void): Promise<{}> {
     let promises: Promise<{}>[] = [];
-    this.forEach((linkNode, idx): void => {
-      const promise = new Promise ((resolve, reject): void => {
+    const cacheAsPromise: (this: void, linkNode: LinkNode, idx: number) => void = (linkNode, idx): void => {
+      const promise = new Promise((resolve, reject): void => {
         const attemptCallback = (): void => {
           try {
             callback(linkNode, idx);
-          } catch (error) {
+          }
+          catch (error) {
             console.error(error);
             reject(error);
           }
@@ -71,7 +90,8 @@ class LinkedList {
         setTimeout(attemptCallback, 0);
       });
       promises.push(promise);
-    });
+    };
+    this.forEach(cacheAsPromise);
     return Promise.all(promises);
   }
 }

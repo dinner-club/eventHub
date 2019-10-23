@@ -53,6 +53,52 @@ describe('LinkedList', () => {
       });
     });
 
+    describe('insertAfter()', () => {
+      it('allows inserting after a node', () => {
+        const list = new LinkedList([0, 2, 5]);
+        expect(list.first().val).toBe(0);
+        expect(list.last().val).toBe(5);
+        const middle = list.first().next();
+        expect(middle.val).toBe(2);
+
+        list.insertAfter(middle, 3);
+        list.insertAfter(list.first(), 1);
+        expect(middle.next().val).toBe(3);
+        expect(middle.previous().val).toBe(1);
+        const testFn = jest.fn();
+        const cb = link => testFn(link.val);
+        list.forEach(cb);
+        expect(testFn).toHaveBeenNthCalledWith(1, 0);
+        expect(testFn).toHaveBeenNthCalledWith(2, 1);
+        expect(testFn).toHaveBeenNthCalledWith(3, 2);
+        expect(testFn).toHaveBeenNthCalledWith(4, 3);
+        expect(testFn).toHaveBeenNthCalledWith(5, 5);
+      });
+    });
+
+    describe('insertBefore()', () => {
+      it('allows inserting before a node', () => {
+        const list = new LinkedList([0, 2, 5]);
+        expect(list.first().val).toBe(0);
+        expect(list.last().val).toBe(5);
+        const middle = list.first().next();
+        expect(middle.val).toBe(2);
+
+        list.insertBefore(middle, 1);
+        list.insertBefore(list.last(), 4);
+        expect(middle.next().val).toBe(4);
+        expect(middle.previous().val).toBe(1);
+        const testFn = jest.fn();
+        const cb = link => testFn(link.val);
+        list.forEach(cb);
+        expect(testFn).toHaveBeenNthCalledWith(1, 0);
+        expect(testFn).toHaveBeenNthCalledWith(2, 1);
+        expect(testFn).toHaveBeenNthCalledWith(3, 2);
+        expect(testFn).toHaveBeenNthCalledWith(4, 4);
+        expect(testFn).toHaveBeenNthCalledWith(5, 5);
+      });
+    });
+
   });
 
   describe('When creating with inital values', () => {

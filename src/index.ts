@@ -1,59 +1,58 @@
 import LinkNode from "./linkedList/LinkNode";
 import LinkedList from "./linkedList";
-import Middleware from "./middleware";
+import Middleware, { MiddlewareFn } from "./middleware";
 
-interface EventHubListener {
+export interface EventHubListener {
   id: string;
   key: string;
   registrant: string;
   callback: Function;
 }
 
-interface ListenerDictionaryEntry extends EventHubListener {
+export interface ListenerDictionaryEntry extends EventHubListener {
   linkNode: LinkNode;
 }
 
-interface ListenerDictionary {
+export interface ListenerDictionary {
   [listenerKey: string]: ListenerDictionaryEntry;
 }
 
-interface EventHubEvent {
+export interface EventHubEvent {
   key: string;
   description: string;
   arguments: string[];
   registrant: string;
 }
 
-interface EventDictionaryEntry extends EventHubEvent {
+export interface EventDictionaryEntry extends EventHubEvent {
   listeners: LinkedList;
 }
 
-interface EventDictionary {
+export interface EventDictionary {
   [eventKey: string]: EventDictionaryEntry;
 }
 
-interface EventHubConstructorArgument {
+export interface EventHubConstructorArgument {
   middleware?: Function[];
 }
 
-interface EventHubMessage {
+export interface EventHubMessage {
   payload: any;
   meta: {
     key: string;
     sender: string;
-  }
+  };
 }
 
 class EventHub {
   private _eventDictionary: EventDictionary;
   private _listenerDictionary: ListenerDictionary;
-  private _middleware: Middleware[];
+  private _middleware: Middleware;
 
   public constructor({ middleware = [] }: EventHubConstructorArgument = {}) {
     this._eventDictionary = {};
     this._listenerDictionary = {};
-    this._middleware = [];
-    this._setMiddleware([this._logPreMiddlewareMessage.bind(this), ...middleware, this._send.bind(this)])
+    this._middleware = new Middleware([this._logPreMiddlewareMessage.bind(this), ...middleware, this._send.bind(this)])
   }
 
   public registerEvent(eventHubEvent: EventHubEvent): void {
@@ -73,36 +72,38 @@ class EventHub {
     }
   }
 
-  public deregisterListener(id: string) {
+  public deregisterListener(id: string): void {
     const listener = this._listenerDictionary[id];
     listener.linkNode.remove();
     delete this._listenerDictionary[id];
   }
 
-  public deregisterEvent(key: string) {
+  public deregisterEvent(key: string): void {
     delete this._eventDictionary[key];
   }
 
-  public broadcast(message: EventHubMessage) {
-    this._middleware[0].handler(message);
+  public broadcast(message: EventHubMessage): void {
+    this._middleware.chain(message);
   }
 
-  private _setMiddleware(middleware: any[]) {
-    const all = {};
-    middleware.forEach((middlewareFn, idx) => {
-      this._middleware.push(new Middleware({fn: middlewareFn, idx, all}))
-    });
+  public pushMiddleware(fn: MiddlewareFn): void {
+    this._middleware.push(fn);
   }
 
-  private _logPreMiddlewareMessage(next: Function, msg: EventHubMessage) {
-    next(msg);
+  public unshiftMiddleware(fn: MiddlewareFn): void {
+    this._middleware.unshift(fn);
   }
 
-  private _send(_next: Function, msg: EventHubMessage) {
+  private _logPreMiddlewareMessage(msg: EventHubMessage): EventHubMessage {
+    return msg;
+  }
+
+  private _send(msg: EventHubMessage): EventHubMessage {
     const event = this._eventDictionary[msg.meta.key];
-    event.listeners.forEachAsync((linkNode) => {
+    event.listeners.forEachAsync((linkNode): void => {
       linkNode.val.callback(msg);
     });
+    return msg;
   }
 }
 
